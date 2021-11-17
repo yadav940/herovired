@@ -18,9 +18,12 @@ Future<T?> showAppBottomSheet<T>({
   double? maxHeight,
   DecorationImage? background,
   Color? dragPickColor,
+  bool dragDismissible=true,
+  double initialChildSize=0.7
 }) async {
   return await showModalBottomSheet<T>(
     isScrollControlled: true,
+    isDismissible: false,
     barrierColor: Palette.greyScaleDark0.withOpacity(0.91),
     context: Get.context!,
     builder: (_) => BottomSheetContainer(
@@ -28,6 +31,8 @@ Future<T?> showAppBottomSheet<T>({
       maxHeight: maxHeight,
       background: background,
       dragPickColor: dragPickColor,
+        dragDismissible:dragDismissible,
+        initialChildSize:initialChildSize
     ),
   );
 }
@@ -35,30 +40,48 @@ Future<T?> showAppBottomSheet<T>({
 class BottomSheetContainer extends StatelessWidget {
   final Widget child;
   final double? maxHeight;
+  final double initialChildSize;
   final DecorationImage? background;
   final Color? dragPickColor;
+  final bool dragDismissible;
 
   BottomSheetContainer({
     required this.child,
     this.maxHeight,
+    required this.initialChildSize,
     this.background,
     this.dragPickColor,
+    required this.dragDismissible,
   });
 
   double get calculatedMaxHeight => maxHeight ?? Get.height * 0.8;
 
   Widget shape({required Widget child}) {
-    return Container(
-      constraints: BoxConstraints(maxHeight: calculatedMaxHeight),
-      clipBehavior: Clip.hardEdge,
-      decoration: BoxDecoration(
-        image: background,
-        color: Colors.white,
-        boxShadow: CardStyles.basicShadows,
-        borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(12), topRight: Radius.circular(12)),
-      ),
-      child: child,
+    return DraggableScrollableSheet(
+      initialChildSize: initialChildSize,
+      maxChildSize: 0.9,
+      minChildSize: dragDismissible?0.3:0.0,
+      builder: (BuildContext context, ScrollController scrollController) {
+        return Container(
+          constraints: BoxConstraints(maxHeight: calculatedMaxHeight),
+          clipBehavior: Clip.hardEdge,
+          decoration: BoxDecoration(
+            image: background,
+            color: Colors.white,
+            boxShadow: CardStyles.basicShadows,
+            borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12), topRight: Radius.circular(12)),
+          ),
+          child: ListView(
+            shrinkWrap: true,
+            controller: scrollController,
+            children: [
+              child
+            ],
+          ),
+        );
+      },
+      /*child: ,*/
     );
   }
 

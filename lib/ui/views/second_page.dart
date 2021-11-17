@@ -43,10 +43,12 @@ class SecondPage extends AppPageWithAppBar {
     );
   }
 
-  Future<void> openBottomSheet(title, progress) async {
+  Future<void> openBottomSheet(title, progress,{initialChildSize=0.7}) async {
     await showAppBottomSheet(
+      dragDismissible: false,
+      initialChildSize: initialChildSize,
       child: getBottomSheet(title, progress),
-    );
+    ).then((value) => openBottomSheet(title, progress,initialChildSize: 0.04));
   }
 
   Widget getBottomSheet(String title, int progress) {
